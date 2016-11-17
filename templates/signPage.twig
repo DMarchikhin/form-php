@@ -1,0 +1,10 @@
+{% extends "layout.twig" %}
+{% block content %}
+  <form class="form" method="post" action="{{ action }}">
+    {% block errorMessage %}{% endblock %}
+    <input class="input" type="text" name="name" placeholder="Name" id="name">
+    <input class="input" type="password" name="password" placeholder="Password" id="password">
+    <button type="submit" class="button">Send</button>
+  </form>
+  <a class="link" href="{{ link }}">{{ anotherAction }}</a>
+{% endblock %}
