@@ -270,6 +270,53 @@
       }
     }
   );
+  $router->respond('POST', '/signin',
+    function(
+      $request, $response, $service, $app
+    ) {
+      session_start();
+      $stmt = $app->db->prepare(
+        'SELECT user_id, name, password
+        FROM users WHERE name = :nm'
+      );
+      $stmt->bindValue(':nm', $_POST['name']);
+      $stmt->execute();
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (empty($user)) {
+        echo $app->twig->render(
+          'signPageError.twig',
+          array(
+            'title' => 'Sign in',
+            'header' => 'Sign in',
+            'anotherAction' => 'Or register',
+            'link' => './register',
+            'action' => './signin',
+            'errorMessage' =>
+              'This user doesn\'t exist'
+          )
+        );
+      } else if ($user['password'] != md5($_POST['password'])) {
+        echo $app->twig->render(
+          'signPageError.twig',
+          array(
+            'title' => 'Sign in',
+            'header' => 'Sign in',
+            'anotherAction' => 'Or register',
+            'link' => './register',
+            'action' => './signin',
+            'errorMessage' =>
+              'Incorrect password'
+          )
+        );
+      } else {
+        $_SESSION['user_name'] = $_POST['name'];
+        $_SESSION['user_id'] = $user['user_id'];
+
+        $response->redirect('./', $code = 302);
+      }
+    }
+  );
   try {
     $router->dispatch();
   }
